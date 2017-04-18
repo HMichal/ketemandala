@@ -10,9 +10,7 @@ PImage pic;
 boolean recordPDF = false;
 boolean showStroke = false;
 boolean showFill = true;
-boolean makeShort = true;
-boolean showTri = false;
-boolean makeMovie = false;
+int trans = 120;
 boolean aspect = true;
 boolean wRotate = true;
 boolean colorScale = true;
@@ -23,7 +21,7 @@ PImage scrShot;
 PVector rectSize;
 PVector lastPos;
 String ogiName = "";
-JFileChooser fc; 
+JFileChooser fc, spotStyle; 
 
 color bg = 0; //#98c5f7;
 int fac = 16;
@@ -39,7 +37,8 @@ int dotSize = 3;
 PShape[] sp;
 PShape[] mi;
 
-String readyImage = "fl_201482_127_2933";
+String readyImage = "";
+String Folder = "spots";
 boolean nekudot = false;
 SpotObj[] tri;
 
@@ -52,17 +51,11 @@ void setup() {
   fc = new JFileChooser();
   if (openFileAndGetImage() == 0)
     exit();
+  spotStyle = new JFileChooser(); 
   background(bg);
   frameRate(10);
   shapeMode(CENTER);
-  // init shapes
-  sp = new PShape[6];
-  mi = new PShape[6];
-  for (int i=1; i<7; i++) {
-    sp[i-1] = loadShape("splash/s"+i+".svg");
-    mi[i-1] = loadShape("splash/m"+i+".svg");
-  }
-  
+  OpenNewStyle();
   initit();
 
   noLoop();
@@ -71,17 +64,13 @@ void setup() {
 /////////////////////////////// DRAW //////////////////////////
 void draw() {
   background(bg);
-  
+
   for (int i=0; i < numof; i++) {
     if (tri[i] != null) {
       if (wRotate) tri[i].wRotateDraw();
       else
         tri[i].draw();
     }
-  }
-  if (makeMovie) {
-    String fname="forMov/mov_" + year() + month() + day() + "_######" + ".jpg";
-    saveFrame(fname);
   }
 }
 public void initit() {
@@ -97,7 +86,7 @@ public void initit(int byMouse) {
     lastPos.x = width/2;
     lastPos.y = height/2;
   }
- 
+
   tri = new SpotObj[numof];
   float limtri = width/2;
   float limang = TWO_PI/fac+1;
@@ -109,7 +98,7 @@ public void initit(int byMouse) {
     color fillColor = myPallete.get(int(random(0, myPallete.width)), int(random(0, myPallete.height)));
     if (colorScale) {
       fillColor = myPallete.get(int(random(1, myPallete.width)), 
-      int(max(map(limtri, 1, height/2, 1, myPallete.height-1),1)));
+        int(max(map(limtri, 1, height, 1, myPallete.height-1), 1)));
     }
     PVector p1 = new PVector(limtri, random(-limang, limang));
     tri[i] = new SpotObj(p1.x, p1.y, 
@@ -142,6 +131,12 @@ void keyPressed() {
     redraw();
   }
 
+  if (key == 'v' || key == 'V') {
+    OpenNewStyle();
+    initit();
+    redraw();
+  }
+
   if (key == 'o' || key =='O') {
     if (openFileAndGetImage() == 0)
       exit();
@@ -162,7 +157,7 @@ void keyPressed() {
     scrShot=get(0, 0, width, height);
     scrShot.save(fname);
   }
-  
+
   if (key == 'd' || key =='D') {
     aspect = !aspect;
     background(bg);
@@ -237,15 +232,12 @@ void keyPressed() {
     redraw();
   }
 
-  if (key == 'x' || key == 'X') {
-    makeMovie = !makeMovie;
-    background(bg);
-    redraw();
-  }
-
   if (key == 't' || key == 'T') {
-    showTri = !showTri;
-    background(bg);
+    if (trans == 120)
+      trans = 180;
+    else
+      trans = 120;
+    initit();
     redraw();
   }
 }
@@ -278,4 +270,33 @@ int openFileAndGetImage() {
     }
   } 
   return 0;
+}
+
+int openStyleFile() {
+
+  int returnVal = spotStyle.showOpenDialog(null); 
+
+  if (returnVal == JFileChooser.APPROVE_OPTION) { 
+    File file = spotStyle.getSelectedFile(); 
+
+    if (file == null)
+      return 0;
+    Folder = file.getParent();
+    if (Folder != null) {
+      return 1;
+    } else return 0;
+  } 
+  return 0;
+}
+
+void OpenNewStyle() {
+  if (openStyleFile() == 0)
+    exit();
+  // init shapes
+  sp = new PShape[6];
+  mi = new PShape[6];
+  for (int i=1; i<7; i++) {
+    sp[i-1] = loadShape(Folder + "/s"+i+".svg");
+    mi[i-1] = loadShape(Folder + "/m"+i+".svg");
+  }
 }
