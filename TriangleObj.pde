@@ -25,8 +25,7 @@ class SpotObj {
   void draw() {
     int peradius = fac;
     float sl = slices;
-
-    fill(fillc, 120);
+    fill(fillc, trans);
 
     if (showStroke) {
       stroke(fillc, 150); //linec
@@ -35,7 +34,7 @@ class SpotObj {
     }
 
     if (showFill) {
-      fill(fillc, 120);
+      fill(fillc, trans);
     } else {
       stroke(fillc, 220);
       noFill();
@@ -62,7 +61,7 @@ class SpotObj {
    void wRotateDraw() {
     float sl = slices;
 
-    fill(fillc, 120);
+    fill(fillc, trans);
 
     if (showStroke) {
       stroke(fillc, 150); //linec
@@ -71,7 +70,7 @@ class SpotObj {
     }
 
     if (showFill) {
-      fill(fillc, 120);
+      fill(fillc, trans);
     } else {
       stroke(fillc, 220);
       noFill();
